@@ -23,6 +23,14 @@ class Patient(Base):
     date_of_birth = models.DateField(blank=True, null=True)
     external_id = models.CharField(max_length=250, unique=True)
 
+    def to_dict(self):
+        """Control what will be in JSON response."""
+        return {'id': self.id,
+                'lastName': self.last_name,
+                'firstName': self.first_name,
+                'dateOfBirth': self.date_of_birth,
+                'externalId': self.external_id}
+
     def __str__(self):
         """Represent object."""
         return '{0} {1} <extID:{2}>'.format(
@@ -41,6 +49,13 @@ class Payment(Base):
     patient = models.ForeignKey(Patient, related_name='payments',
                                 on_delete=models.CASCADE)
     external_id = models.CharField(max_length=250, unique=True)
+
+    def to_dict(self):
+        """Control what will be in JSON response."""
+        return {'id': self.id,
+                'amount': self.amount,
+                'patientId': self.patient.external_id,
+                'externalId': self.external_id}
 
     class Meta:
         """Model options."""

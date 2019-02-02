@@ -1,11 +1,11 @@
 """Here are payments views."""
-# from django.shortcuts import render
 from django.http import JsonResponse
-from django.views.generic.edit import CreateView
+from django.views.generic import CreateView, ListView
 from django.forms import formset_factory
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models.query import QuerySet
 
-from payments.models import Patient
+from payments.models import Patient, Payment
 from payments.forms import PatientForm, PaymentForm
 from payments.helpers import dehydrate_json_data
 
@@ -17,11 +17,13 @@ class ExtendedJsonEncoder(DjangoJSONEncoder):
         """Handle object json representation."""
         if isinstance(o, Patient):
             return 'Patient object'
+        if isinstance(o, QuerySet):
+            return [x.to_dict() for x in o]
         else:
             return super().default(o)
 
 
-class JsonMixin:
+class InputJsonMixin:
     """Mixin which add support of JSON input data processing.
 
     If input JSON data contain the json field names in camelCase it will
@@ -51,6 +53,30 @@ class JsonMixin:
                     'files': self.request.FILES,
                 })
         return kwargs
+
+
+class OutputJsonMixin:
+    """Mixin which add support of JSON response with pagination."""
+
+    paginate_by = 10
+
+    def get_queryset(self):
+        """Csutomize query set."""
+        return super().get_queryset().order_by('id')
+
+    def render_to_response(self, context, **response_kwargs):
+        """Override original render_to_response method."""
+        pagination = context['paginator']
+        page = context['page_obj']
+        data = {
+            'items': page.object_list,
+            'pages': pagination.num_pages,
+            'page_num': page.number,
+            'next_page': page.next_page_number() if page.has_next() else None,
+            'prev_page': page.previous_page_number() if page.has_previous() else None
+        }
+        return JsonResponse(data, encoder=ExtendedJsonEncoder,
+                            safe=False)
 
 
 class FormsetMixin:
@@ -94,13 +120,17 @@ class FormsetMixin:
                             safe=False)
 
 
-class PatientsCreate(JsonMixin, FormsetMixin, CreateView):
+class PatientsCreate(InputJsonMixin, OutputJsonMixin, FormsetMixin,
+                     CreateView, ListView):
     """Create new patients."""
 
     form_class = formset_factory(PatientForm)
+    model = Patient
 
 
-class PaymentsCreate(JsonMixin, FormsetMixin, CreateView):
+class PaymentsCreate(InputJsonMixin, OutputJsonMixin, FormsetMixin,
+                     CreateView, ListView):
     """Create new payments."""
 
     form_class = formset_factory(PaymentForm)
+    model = Payment
