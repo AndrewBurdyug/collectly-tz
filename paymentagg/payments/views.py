@@ -121,16 +121,53 @@ class FormsetMixin:
                             safe=False)
 
 
-class PatientsCreate(InputJsonMixin, OutputJsonMixin, FormsetMixin,
-                     CreateView, ListView):
+class FilterPatientsByPaymentAmount:
+    """Filter patients by payments amount."""
+
+    def get_queryset(self):
+        """Csutomize query set."""
+        queryset = super().get_queryset()
+        payments_min_amount = self.request.GET.get('payments_min')
+        payments_max_amount = self.request.GET.get('payments_max')
+
+        if payments_min_amount:
+            queryset = queryset.filter(
+                payments__amount__gt=payments_min_amount)
+
+        if payments_max_amount:
+            queryset = queryset.filter(
+                payments__amount__lt=payments_max_amount)
+
+        return queryset.distinct()
+
+
+class FilterPaymentsByPatientExternalID:
+    """Filter payments by patient external id."""
+
+    def get_queryset(self):
+        """Csutomize query set."""
+        queryset = super().get_queryset()
+        patient_external_id = self.request.GET.get('external_id')
+
+        if patient_external_id:
+            queryset = queryset.filter(
+                patient__external_id=patient_external_id)
+
+        return queryset
+
+
+class PatientsCreate(FilterPatientsByPaymentAmount,
+                     InputJsonMixin, OutputJsonMixin,
+                     FormsetMixin, CreateView, ListView):
     """Create new patients."""
 
     form_class = PatientsFormSet
     model = Patient
 
 
-class PaymentsCreate(InputJsonMixin, OutputJsonMixin, FormsetMixin,
-                     CreateView, ListView):
+class PaymentsCreate(FilterPaymentsByPatientExternalID,
+                     InputJsonMixin, OutputJsonMixin,
+                     FormsetMixin, CreateView, ListView):
     """Create new payments."""
 
     form_class = PaymentsFormSet
