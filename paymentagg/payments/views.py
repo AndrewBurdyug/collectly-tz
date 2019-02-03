@@ -1,12 +1,13 @@
+
 """Here are payments views."""
 from django.http import JsonResponse
 from django.views.generic import CreateView, ListView
-from django.forms import formset_factory
+
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.query import QuerySet
 
 from payments.models import Patient, Payment
-from payments.forms import PatientForm, PaymentForm
+from payments.forms import PatientsFormSet, PaymentsFormSet
 from payments.helpers import dehydrate_json_data
 
 
@@ -124,7 +125,7 @@ class PatientsCreate(InputJsonMixin, OutputJsonMixin, FormsetMixin,
                      CreateView, ListView):
     """Create new patients."""
 
-    form_class = formset_factory(PatientForm)
+    form_class = PatientsFormSet
     model = Patient
 
 
@@ -132,5 +133,5 @@ class PaymentsCreate(InputJsonMixin, OutputJsonMixin, FormsetMixin,
                      CreateView, ListView):
     """Create new payments."""
 
-    form_class = formset_factory(PaymentForm)
+    form_class = PaymentsFormSet
     model = Payment

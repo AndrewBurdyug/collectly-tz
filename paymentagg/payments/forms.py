@@ -1,5 +1,6 @@
 """Here are forms of payments models."""
-from django.forms import ModelForm, ModelChoiceField
+from django.forms import ModelForm, ModelChoiceField, formset_factory
+
 from payments.models import Patient, Payment
 
 
@@ -24,3 +25,7 @@ class PaymentForm(ModelForm):
 
         model = Payment
         fields = '__all__'
+
+
+PatientsFormSet = formset_factory(PatientForm)
+PaymentsFormSet = formset_factory(PaymentForm)
