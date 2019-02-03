@@ -64,6 +64,106 @@ Sample data is provided in patients.json and payments.json files.
 
 ---
 
+## Requirements
+
+The basic system requirements are:
+
+ - Python 3.x
+ - Django>=2.1.5
+ - database (see the django supported database engines here https://docs.djangoproject.com/en/2.1/ref/databases/)
+
+## Local deployment for development
+
+Clone the project:
+
+```
+$ git clone git@github.com:AndrewBurdyug/collectly-tz.git
+```
+
+Create a new virtual environment:
+
+```
+$ sudo apt-get install python python-dev python-virtualenv git
+# mkdir ~/envs
+$ virtualenv ~/envs/collectly-tz
+```
+
+Enable virtual env:
+
+```
+[buran@buran-pc collectly-tz] $ . ~/envs/collectly-tz/bin/activate
+(collectly-tz) [buran@buran-pc collectly-tz]$ pip install -U setuptools pip
+
+```
+
+Install python requirements:
+
+```
+(collectly-tz) [buran@buran-pc collectly-tz]$ pip install -r requrements.txt
+```
+
+Run migrations:
+
+```
+(collectly-tz) [buran@buran-pc collectly-tz]$ cd paymentagg
+(collectly-tz) [buran@buran-pc paymentagg]$ ./manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, payments, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying payments.0001_initial... OK
+  Applying payments.0002_auto_20190202_1505... OK
+  Applying sessions.0001_initial... OK
+(collectly-tz) [buran@buran-pc paymentagg]$
+```
+
+Create superuser account (optional) if you want to use the back-office (/admin):
+
+```
+(collectly-tz) [buran@buran-pc paymentagg]$ ./manage.py createsuperuser
+Username (leave blank to use 'buran'): admin
+Email address: admin@ex.com
+Password:
+Password (again):
+Superuser created successfully.
+(collectly-tz) [buran@buran-pc paymentagg]$
+```
+
+Run local development server:
+
+```
+(collectly-tz) [buran@buran-pc paymentagg]$ ./manage.py runserver
+Performing system checks...
+
+System check identified no issues (0 silenced).
+February 03, 2019 - 09:18:25
+Django version 2.1.5, using settings 'paymentagg.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+```
+
+## Extra validation rules
+
+Currently we add just one extra rules: date of birth patient cannot be less or equal 1900 year and cannot be from future.
+
+## Production deployment
+
+For production deployment I suggest to use uWSGI + Nginx and manage the application service
+by systemD. You can see config examples here: https://github.com/AndrewBurdyug/django-folder
+
 ## Console data loading
 
 To load data from json file you can use this command:
