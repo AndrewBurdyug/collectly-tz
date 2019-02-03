@@ -1,4 +1,3 @@
-
 """Here are payments views."""
 from django.http import JsonResponse
 from django.views.generic import CreateView, ListView
