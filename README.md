@@ -423,3 +423,69 @@ will cause such response with errors (only 1 item has been saved successfully):
     }
 ]
 ```
+
+## API pagination response
+
+You can configure count of items which will be in one response by the
+`settings.PAYMENTAGG_ITEMS_PER_PAGE` option (default is 10).
+
+For example, if you settled it to 2, the 'GET /patients' response will looks like:
+
+```
+{
+    "items": [
+        {
+            "id": 1,
+            "lastName": "Deckard",
+            "firstName": "Rick",
+            "dateOfBirth": "1983-02-01",
+            "externalId": "52"
+        },
+        {
+            "id": 2,
+            "lastName": "Stratton",
+            "firstName": "Pris",
+            "dateOfBirth": "1993-12-20",
+            "externalId": "4"
+        }
+    ],
+    "pages": 2,
+    "page_num": 1,
+    "next_page": 2,
+    "prev_page": null
+}
+```
+
+the next page request will be `GET /patients?page=2`:
+
+```
+{
+    "items": [
+        {
+            "id": 3,
+            "lastName": "Batti",
+            "firstName": "Roy",
+            "dateOfBirth": "1993-06-12",
+            "externalId": "8"
+        },
+        {
+            "id": 4,
+            "lastName": "Tyrell",
+            "firstName": "Eldon",
+            "dateOfBirth": "1956-04-01",
+            "externalId": "15"
+        }
+    ],
+    "pages": 2,
+    "page_num": 2,
+    "next_page": null,
+    "prev_page": 1
+}
+```
+
+Every 'GET' response has these pagination json fields:
+
+ - `pages`: total number of pages
+ - `page_num`: current page number
+ - `next_page`: next page number
+ - `prev_page`: previous page number
