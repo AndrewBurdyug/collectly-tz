@@ -218,3 +218,208 @@ Failed load: {'amount': Decimal('2.29'), 'external_id': '602'}, errors: {'patien
 Successfully load: {'amount': Decimal('9.29'), 'patient': <Patient: Roy Batti <extID:8>>, 'external_id': '602'}
 (collectly-tz) [buran@buran-pc paymentagg]$
 ```
+
+## API errors reporting
+
+For example this sample set for the "POST /patients" endpoint:
+
+```
+[{
+  "firstName": "Aaron",
+  "lastName": "Achard",
+  "dateOfBirth": "2083-02-01",
+  "externalId": "52"
+}, {
+  "firstName": "Rick",
+  "lastName": "Deckard",
+  "dateOfBirth": "1983-02-01",
+  "externalId": "52"
+}, {
+  "firstName": "Pris",
+  "lastName": "Stratton",
+  "dateOfBirth": "1993-12-20",
+  "externalId": "4"
+}, {
+  "firstName": "Roy",
+  "lastName": "Batti",
+  "dateOfBirth": "1993-06-12",
+  "externalId": "8"
+}, {
+  "firstName": "Eldon",
+  "lastName": "Tyrell",
+  "dateOfBirth": "1956-04-01",
+  "externalId": "15"
+}]
+```
+
+will cause such response with errors:
+
+```
+[
+    {
+        "status": "fail",
+        "data": {
+            "first_name": "Aaron",
+            "last_name": "Achard",
+            "middle_name": null,
+            "external_id": "52"
+        },
+        "errors": {
+            "date_of_birth": [
+                "Date of birth cannot be in future"
+            ]
+        }
+    },
+    {
+        "status": "success",
+        "data": {
+            "first_name": "Rick",
+            "last_name": "Deckard",
+            "middle_name": null,
+            "date_of_birth": "1983-02-01",
+            "external_id": "52"
+        }
+    },
+    {
+        "status": "success",
+        "data": {
+            "first_name": "Pris",
+            "last_name": "Stratton",
+            "middle_name": null,
+            "date_of_birth": "1993-12-20",
+            "external_id": "4"
+        }
+    },
+    {
+        "status": "success",
+        "data": {
+            "first_name": "Roy",
+            "last_name": "Batti",
+            "middle_name": null,
+            "date_of_birth": "1993-06-12",
+            "external_id": "8"
+        }
+    },
+    {
+        "status": "success",
+        "data": {
+            "first_name": "Eldon",
+            "last_name": "Tyrell",
+            "middle_name": null,
+            "date_of_birth": "1956-04-01",
+            "external_id": "15"
+        }
+    }
+]
+```
+
+And this one for "POST /payments":
+
+```
+[{
+  "amount": 4.46,
+  "patientId": "5",
+  "externalId": "501"
+}, {
+  "amount": 5.66,
+  "patientId": "5",
+  "externalId": "502"
+}, {
+  "amount": 7.10,
+  "patientId": "5",
+  "externalId": "503"
+},{
+  "amount": 23.32,
+  "patientId": "6",
+  "externalId": "601"
+}, {
+  "amount": 2.29,
+  "patientId": "6",
+  "externalId": "602"
+}, {
+  "amount": 9.29,
+  "patientId": "8",
+  "externalId": "602"
+}]
+```
+
+will cause such response with errors (only 1 item has been saved successfully):
+
+```
+[
+    {
+        "status": "fail",
+        "data": {
+            "amount": "4.46",
+            "external_id": "501"
+        },
+        "errors": {
+            "patient": [
+                "Select a valid choice. That choice is not one of the available choices."
+            ]
+        }
+    },
+    {
+        "status": "fail",
+        "data": {
+            "amount": "5.66",
+            "external_id": "502"
+        },
+        "errors": {
+            "patient": [
+                "Select a valid choice. That choice is not one of the available choices."
+            ]
+        }
+    },
+    {
+        "status": "fail",
+        "data": {
+            "amount": "7.1",
+            "external_id": "503"
+        },
+        "errors": {
+            "patient": [
+                "Select a valid choice. That choice is not one of the available choices."
+            ]
+        }
+    },
+    {
+        "status": "fail",
+        "data": {
+            "amount": "23.32",
+            "external_id": "601"
+        },
+        "errors": {
+            "patient": [
+                "Select a valid choice. That choice is not one of the available choices."
+            ]
+        }
+    },
+    {
+        "status": "fail",
+        "data": {
+            "amount": "2.29",
+            "external_id": "602"
+        },
+        "errors": {
+            "patient": [
+                "Select a valid choice. That choice is not one of the available choices."
+            ]
+        }
+    },
+    {
+        "status": "success",
+        "data": {
+            "amount": "9.29",
+            "patient": {
+                "id": 3,
+                "lastName": "Batti",
+                "firstName": "Roy",
+                "dateOfBirth": "1993-06-12",
+                "externalId": "8"
+            },
+            "external_id": "602"
+        }
+    }
+]
+```
