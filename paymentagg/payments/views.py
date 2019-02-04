@@ -15,9 +15,9 @@ class ExtendedJsonEncoder(DjangoJSONEncoder):
 
     def default(self, o):
         """Handle object json representation."""
-        if isinstance(o, Patient):
-            return 'Patient object'
-        if isinstance(o, QuerySet):
+        if isinstance(o, Patient) or isinstance(o, Payment):
+            return o.to_dict()
+        elif isinstance(o, QuerySet):
             return [x.to_dict() for x in o]
         else:
             return super().default(o)
@@ -90,7 +90,7 @@ class FormsetMixin:
 
     def form_invalid(self, form):
         """Handle invalid data."""
-        self.results.append({'status': 'fail invalid form',
+        self.results.append({'status': 'fail',
                              'data': form.cleaned_data,
                              'errors': form.errors})
 
@@ -100,7 +100,7 @@ class FormsetMixin:
         try:
             form.save()
         except Exception as er:
-            self.results.append({'status': 'fail save failed',
+            self.results.append({'status': 'fail',
                                  'data': form.cleaned_data,
                                  'errors': str(er)})
         else:
