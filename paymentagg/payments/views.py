@@ -1,7 +1,7 @@
 """Here are payments views."""
 from django.http import JsonResponse
 from django.views.generic import CreateView, ListView
-
+from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models.query import QuerySet
 
@@ -58,7 +58,7 @@ class InputJsonMixin:
 class OutputJsonMixin:
     """Mixin which add support of JSON response with pagination."""
 
-    paginate_by = 10
+    paginate_by = settings.PAYMENTAGG_ITEMS_PER_PAGE
 
     def get_queryset(self):
         """Csutomize query set."""
